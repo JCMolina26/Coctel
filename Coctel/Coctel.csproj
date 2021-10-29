@@ -7,15 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="View\unknown.png" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Folder Include="ViewModel\Helpers\" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Resource Include="View\unknown.png" />
   </ItemGroup>
 
 </Project>

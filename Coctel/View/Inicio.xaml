@@ -7,42 +7,62 @@
         mc:Ignorable="d"
         
         Title="Cóctel" Height="500" Width="600" ResizeMode="NoResize" SizeToContent="Manual" WindowStartupLocation="CenterScreen" Cursor="Pen" >
-    
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="3*"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="5*"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
-        <!--Mensaje de bienvenida de coctel-->
+
+    <DockPanel>
+        <Menu DockPanel.Dock="Top">
+            <MenuItem Header="Archivo">
+                <!--Sección dedicada a la documentación-->
+                <MenuItem Header="Acerca de Cóctel"/>
+                <Separator/>
+                <MenuItem Header="Salir" Click="MenuItem_Click"/>
+            </MenuItem>
+        </Menu>
+        <Grid DockPanel.Dock="Bottom">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="3*"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="5*"/>
+            </Grid.RowDefinitions>
+            <!--Mensaje de bienvenida de coctel-->
             <TextBlock Grid.Row="0" Text="Bienvenido a Cóctel" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="30" Margin="36,0,0,0"/>
-        <!-- Sección destinada a LOGIN -->
-            <StackPanel Margin="150,5"  Grid.Row="1">
-              <TextBlock Text="Usuario:" HorizontalAlignment="Center"  />
-              <TextBox Margin="10,2" />
-              <TextBlock Text="Contraseña:" HorizontalAlignment="Center"/>
-              <TextBox Margin="10,2" />
-              <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="2*"/>
-                    <ColumnDefinition Width="*" />
-                </Grid.ColumnDefinitions>
-                <TextBlock Grid.Column="0" Text="¿Olvidaste la contraseña?" Margin="10"/>
-                <Button Grid.Column="1" Margin="10,10,10,10" Grid.ColumnSpan="1" Content="Login"/>
-              </Grid>
+            <!-- Sección destinada a LOGIN -->
+            <StackPanel Margin="140,5"  Grid.Row="1">
+                <TextBlock Text="Usuario:" HorizontalAlignment="Center"  />
+                <TextBox Margin="10,2" />
+                <TextBlock Text="Contraseña:" HorizontalAlignment="Center"/>
+                <TextBox Margin="10,2" />
+                <Grid Margin="0,10,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="2*"/>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Center" Text="¿Olvidaste la contraseña?" />
+                    <TextBlock Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center" Text="Registrarse" />
+                    <Button Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.ColumnSpan="1" Content="Iniciar sesión"/>
+                </Grid>
             </StackPanel>
-        <!-- Sección dedicada a búsqueda-->
-        <StackPanel Grid.Row="2" Margin="50,5" Orientation="Horizontal">
-            <TextBox Text="Buscar cóctel..." VerticalAlignment="Center" Width="160"/>
-            <Button Content="Buscar" Margin="10,5"/>
-            <TextBox Text="Añadir ingrediente..."  VerticalAlignment="Center" Width="160" Margin="50,0,0,0"/>
-            <Button Content="Añadir" Margin="10,5"/>
-        </StackPanel>
-        <!-- Sección dedicada a la lista de cócteles -->
-        <!--TODO-->
-        <!--Sección dedicada a la documentación-->
-        <TextBlock Grid.Row="4" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="10" Text="Acerca de Cóctel" Foreground=" Blue"/>
-    </Grid>
+            <!-- Sección dedicada a búsqueda-->
+            <StackPanel Margin="30,0" Grid.Row="2">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="2*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="2*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Border BorderThickness="10"/>
+                    <TextBox Grid.Column="0" Text="Buscar cóctel..." VerticalAlignment="Center" />
+                    <Button Grid.Column="1" Content="Buscar" Margin="10"/>
+                    <TextBox Grid.Column="3" Text="Añadir ingrediente..."  VerticalAlignment="Center"/>
+                    <Button Grid.Column="4" Content="Añadir" Margin="10"/>
+                </Grid>
+            </StackPanel>
+            <!-- Sección dedicada a la lista de cócteles -->
+            <!--TODO-->
+        </Grid>
+    </DockPanel>
+    
 </Window>
