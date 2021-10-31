@@ -14,7 +14,8 @@
                 <!--Sección dedicada a la documentación-->
                 <MenuItem Header="Acerca de Cóctel"/>
                 <Separator/>
-                <MenuItem Header="Salir" Click="MenuItem_Click"/>
+                <MenuItem Header="Salir" Click="ExitApp_Click"/>
+                <MenuItem Header="Testear conexion" Click="Conexion_Click"/>
             </MenuItem>
         </Menu>
         <Grid DockPanel.Dock="Bottom">
@@ -61,6 +62,7 @@
                 </Grid>
             </StackPanel>
             <!-- Sección dedicada a la lista de cócteles -->
+            <TextBlock x:Name="testing" Text="Placeholder" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="5" Grid.Row="3"/>
             <!--TODO-->
         </Grid>
     </DockPanel>

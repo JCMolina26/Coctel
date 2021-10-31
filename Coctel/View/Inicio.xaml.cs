@@ -1,5 +1,7 @@
-﻿using System;
+﻿using Coctel.ViewModel.Helpers;
+using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -26,9 +28,28 @@ namespace Coctel
             
         }
 
-        private void MenuItem_Click(object sender, RoutedEventArgs e)
+        private void ExitApp_Click(object sender, RoutedEventArgs e)
         {
             Application.Current.Shutdown();
+        }
+
+        private void Conexion_Click(object sender, RoutedEventArgs e)
+        {
+            testing.Text = "Getting Connection ...";
+            SqlConnection conn = DBUtils.GetDBConnection();
+            try
+            {
+                testing.Text = "Openning Connection ...";
+                                conn.Open();
+                testing.Text = "Connection successful!";
+                testing.Foreground = Brushes.Green;
+            }
+            catch (Exception)
+            {
+                testing.Text = "Pasaron cosas";
+                testing.Foreground = Brushes.Red;
+            }
+            Console.Read();
         }
     }
 }
