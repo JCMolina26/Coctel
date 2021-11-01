@@ -3,13 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Coctel.ViewModel.Helpers;
 
 namespace CoctelClasses.Model
 {
-    class Coctel
+    public class Cocktail
     {
-        public int CoctelID { get; set;}
-        public List<Ingrediente> Ingredientes { get; set;}
+        public int ID { get; set; }
+        public List<Ingrediente> Ingredientes { get; set; }
         public string Nombre { get; set; }
         public string Tipo { get; set; }
         public int Dificultad { get; set; }
@@ -18,33 +19,68 @@ namespace CoctelClasses.Model
         public string Descripcion { get; set; }
     }
 
-    class Ingrediente
+    public class Ingrediente
     {
-        public int IngredienteID { get; set; }
+        public int ID { get; set; }
         public string Nombre { get; set; }
         public int Calorias { get; set; }
         public int PorcentajeAlcohol { get; set; }
-        
+
     }
-    class Usuario
+    public class Usuario
     {
-        public int UsuarioID { get; set; }
+        public int ID { get; set; }
         public string Nombre { get; set; }
         public string Password { get; set; }
-        public List<Coctel> Favoritos { get; set; }
+        public List<Cocktail> Favoritos { get; set; }
         public List<Ingrediente> Inventario { get; set; }
 
-        public bool NuevoFavorito(Coctel coctel)
+        public bool NuevoFavorito(Cocktail coctel)
         {
-            if (Favoritos.Contains(coctel)) { return false; } else { Favoritos.Add(item: coctel); return true; }
-      
+            if (Favoritos.Contains(coctel))
+            { return false; }
+            else
+            {
+                bool success = DatabaseVM.InsertCocktail(coctel, this);
+                if (success) { Favoritos.Add(item: coctel); return true; }
+                else return false;
+            }
         }
         public bool NuevoIngrediente(Ingrediente ingrediente)
         {
-            if (Inventario.Contains(ingrediente)) { return false; } else { Inventario.Add(ingrediente); return true; }
+            if (Inventario.Contains(ingrediente))
+            { return false; }
+            else
+            {
+                bool success = DatabaseVM.InsertIngrediente(ingrediente, this);
+                if (success) { Inventario.Add(ingrediente); return true; }
+                else return false;
+            }
+        }
+        public bool EliminarFavorito(Cocktail coctel)
+        {
+            if (!Favoritos.Contains(coctel))
+            { return false; }
+            else
+            {
+                bool success = DatabaseVM.DeleteCocktail(coctel, this);
+                if (success) { Favoritos.Remove(item: coctel); return true; }
+                else return false;
+            }
+        }
+        public bool EliminarIngrediente(Ingrediente ingrediente)
+        {
+            if (!Inventario.Contains(ingrediente))
+            { return false; }
+            else
+            {
+                bool success = DatabaseVM.DeleteIngrediente(ingrediente, this);
+                if (success) { Inventario.Remove(item: ingrediente); return true; }
+                else return false;
+            }
         }
     }
-    class Recomendacion
+    public class Recomendacion
     {
         public int CoctelID { get; set; }
         private List<Usuario> recomendados;
@@ -54,7 +90,5 @@ namespace CoctelClasses.Model
             get { return recomendados; }
             set { recomendados = value; }
         }
-
-
     }
 }

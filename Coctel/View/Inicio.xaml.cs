@@ -36,7 +36,7 @@ namespace Coctel
         private void Conexion_Click(object sender, RoutedEventArgs e)
         {
             testing.Text = "Getting Connection ...";
-            SqlConnection conn = DBUtils.GetDBConnection();
+            SqlConnection conn = DatabaseVM.GetDBConnection();
             try
             {
                 testing.Text = "Openning Connection ...";

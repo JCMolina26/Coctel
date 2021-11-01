@@ -62,6 +62,9 @@
                 </Grid>
             </StackPanel>
             <!-- Sección dedicada a la lista de cócteles -->
+            <ListView Grid.Row="4" >
+                
+            </ListView>
             <TextBlock x:Name="testing" Text="Placeholder" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="5" Grid.Row="3"/>
             <!--TODO-->
         </Grid>
