@@ -36,50 +36,5 @@ namespace CoctelClasses.Model
         public string Password { get; set; }
         public List<Cocktail> Favoritos { get; set; }
         public List<Ingrediente> Inventario { get; set; }
-
-        public bool NuevoFavorito(Cocktail coctel)
-        {
-            if (Favoritos.Contains(coctel))
-            { return false; }
-            else
-            {
-                bool success = DatabaseVM.Insert(coctel.ID, this, "Favorito");
-                if (success) { Favoritos.Add(item: coctel); return true; }
-                else return false;
-            }
-        }
-        public bool NuevoIngrediente(Ingrediente ingrediente)
-        {
-            if (Inventario.Contains(ingrediente))
-            { return false; }
-            else
-            {
-                bool success = DatabaseVM.Insert(ingrediente.ID, this, "Inventario");
-                if (success) { Inventario.Add(ingrediente); return true; }
-                else return false;
-            }
-        }
-        public bool EliminarFavorito(Cocktail coctel)
-        {
-            if (!Favoritos.Contains(coctel))
-            { return false; }
-            else
-            {
-                bool success = DatabaseVM.Delete(coctel.ID, this, "Favorito");
-                if (success) { Favoritos.Remove(item: coctel); return true; }
-                else return false;
-            }
-        }
-        public bool EliminarIngrediente(Ingrediente ingrediente)
-        {
-            if (!Inventario.Contains(ingrediente))
-            { return false; }
-            else
-            {
-                bool success = DatabaseVM.Delete(ingrediente.ID, this, "Inventario");
-                if (success) { Inventario.Remove(item: ingrediente); return true; }
-                else return false;
-            }
-        }
     }
 }

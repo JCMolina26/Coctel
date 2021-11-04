@@ -10,19 +10,23 @@ namespace Coctel.ViewModel.Commands
 {
     class LoginCommand : ICommand
     {
-        public bool IsLogged = false;
+        public CocktailVM VM { get; set; }
+        public LoginCommand(CocktailVM vm)
+        {
+            VM = vm;
+        }
 
         public event EventHandler CanExecuteChanged;
 
         public bool CanExecute(object parameter)
-        {
-            return !IsLogged;
+        {            
+            return !VM.IsLogged;
         }
 
         public void Execute(object parameter)
         {
-            // bool result = DatabaseVM.Login(username.Text, password.Text);
-            IsLogged = true;
+            string password = parameter as string;
+            VM.Login(VM.username, password);
         }
     }
 }

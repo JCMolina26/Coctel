@@ -19,8 +19,7 @@ namespace Coctel.ViewModel.Commands
 
         public bool CanExecute(object parameter)
         {
-            Cocktail selectedCocktail = parameter as Cocktail;
-            return (selectedCocktail != null);
+            return VM.IsLogged;
         }
 
         public void Execute(object parameter)

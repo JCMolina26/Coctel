@@ -115,6 +115,7 @@ namespace Coctel.ViewModel.Helpers
         public static List<Cocktail> Read()
         {
             List<Cocktail> result = new List<Cocktail>();
+            List<Ingrediente> first = new List<Ingrediente>();           
             result.Clear();
             SqlConnection connection = GetDBConnection();
             connection.Open();
@@ -164,7 +165,7 @@ namespace Coctel.ViewModel.Helpers
                                 PorcentajeRecomendacion = newPorcentaje,
                                 Ingredientes = new List<Ingrediente>()
                             };
-                            result.Add(cocktail);
+                            result.Add(cocktail);                         
                         }
                     }
                 }
@@ -182,22 +183,16 @@ namespace Coctel.ViewModel.Helpers
             }
             return result;
         }
-        public static List<Cocktail> Read(string query) //Override para busquedas
+        public static List<Cocktail> Read(string query) //Override para búsqueda de cócteles
         {
             List<Cocktail> result = new List<Cocktail>();
-            result.Clear();
             SqlConnection connection = GetDBConnection();
             connection.Open();
             try
             {
                 // Definicion de comando Query
 
-                SqlCommand command = new SqlCommand("SELECT C.*, T.nombre AS tipo FROM Coctel C INNER JOIN Tipo T ON C.tipo_ID = T.tipo_ID WHERE C.nombre LIKE '%@query%'", connection);
-
-                // Creacion de parametros
-
-                SqlParameter queryParam = command.Parameters.Add("@query", SqlDbType.Int);
-                queryParam.Value = query;
+                SqlCommand command = new SqlCommand($"SELECT C.*, T.nombre AS tipo FROM Coctel C INNER JOIN Tipo T ON C.tipo_ID = T.tipo_ID WHERE C.nombre LIKE '%{query}%'", connection);
 
                 // Ejecucion del comando
 
@@ -239,6 +234,7 @@ namespace Coctel.ViewModel.Helpers
                                 PorcentajeRecomendacion = newPorcentaje,
                                 Ingredientes = new List<Ingrediente>()
                             };
+                            cocktail.Ingredientes = Read(cocktail);
                             result.Add(cocktail);
                         }
                     }
@@ -333,47 +329,7 @@ namespace Coctel.ViewModel.Helpers
             }
             return result;
         }
-        public static bool Login(string usuario, string password)
-        {
-            SqlConnection connection = GetDBConnection();
-            connection.Open();
-            try
-            {
-                // Definicion de comando Query
-
-                SqlCommand command = new SqlCommand("SELECT * FROM Usuario WHERE nombre = @nombre AND clave = @password", connection);
-
-                // Creacion de parametros
-
-                SqlParameter userParam = command.Parameters.Add("@nombre", SqlDbType.VarChar);
-                userParam.Value = usuario;
-
-                SqlParameter claveParam = command.Parameters.Add("@password", SqlDbType.VarChar);
-                claveParam.Value = password;
-
-                // Ejecucion del comando
-
-
-                using (DbDataReader reader = command.ExecuteReader())
-                {
-                    return (reader.HasRows);
-                }
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine("Error: " + e);
-                Console.WriteLine(e.StackTrace);
-                return false;
-            }
-            finally
-            {
-                connection.Close();
-                connection.Dispose();
-                connection = null;
-            }
-
-        }
-        public static List<Ingrediente> ReadIngredients(Cocktail item)
+        public static List<Ingrediente> Read(Cocktail item) // Override que devuelve la lista de ingredientes de un cóctel
         {
             List<Ingrediente> result = new List<Ingrediente>();
             result.Clear();
@@ -440,7 +396,123 @@ namespace Coctel.ViewModel.Helpers
             }
             return result;
         }
-    
+        public static List<Ingrediente> ReadInventario(Usuario user) // Override del metodo anterior que devuelve lista de favoritos
+        {
+            List<Ingrediente> result = new List<Ingrediente>();
+            result.Clear();
+            SqlConnection connection = GetDBConnection();
+            connection.Open();
+            try
+            {
+                // Definicion de comando Query
+
+                SqlCommand command = new SqlCommand("SELECT Ing.* FROM Inventario Inv INNER JOIN Ingrediente Ing ON Inv.ingrediente_id = Ing.ingrediente_ID WHERE Inv.usuario_ID = @usuario_ID", connection);
+
+                // Creacion de parametros
+
+                SqlParameter userParam = command.Parameters.Add("@usuario_ID", SqlDbType.Int);
+                userParam.Value = user.ID;
+
+                // Ejecucion del comando
+
+
+                using (DbDataReader reader = command.ExecuteReader())
+                {
+                    if (reader.HasRows)
+                    {
+                        while (reader.Read())
+                        {
+                            int id_column = reader.GetOrdinal("coctel_ID");
+                            int newID = Convert.ToInt32(reader.GetValue(id_column));
+
+                            int nombre_column = reader.GetOrdinal("nombre");
+                            string newNombre = reader.GetString(nombre_column);
+
+                            Ingrediente ingrediente = new Ingrediente()
+                            {
+                                ID = newID,
+                                
+                                Nombre = newNombre,
+                                
+                            };
+                            result.Add(ingrediente);
+                        }
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Error: " + e);
+                Console.WriteLine(e.StackTrace);
+            }
+            finally
+            {
+                connection.Close();
+                connection.Dispose();
+                connection = null;
+            }
+            return result;
+        }
+        public static Usuario Login(string usuario, string password)
+        {
+            var favoritos = new List<Cocktail>();
+            var inventario = new List<Ingrediente>();
+            Usuario result = new Usuario()
+            {
+                ID = -1,
+                Password = password,
+                Nombre = usuario,
+                Favoritos = favoritos,
+                Inventario = inventario
+            };
+            SqlConnection connection = GetDBConnection();
+            connection.Open();
+            try
+            {
+                // Definicion de comando Query
+
+                SqlCommand command = new SqlCommand($"SELECT * FROM Usuario WHERE nombre = '{usuario}' AND clave = '{password}'", connection);
+
+
+                // Ejecucion del comando
+
+
+                using (DbDataReader reader = command.ExecuteReader())
+                {
+                    if (reader.HasRows)
+                    {
+
+                        int id_column = reader.GetOrdinal("usuario_ID");
+                        int newID = Convert.ToInt32(reader.GetValue(id_column));
+
+                        result.ID = newID;
+                        result.Nombre = usuario;
+                        result.Password = password;
+
+                        favoritos = Read(result);
+                        inventario = ReadInventario(result);
+                        result.Favoritos = favoritos;
+                        result.Inventario = inventario;
+                        return result;
+                    }
+                    else { return result; }
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Error: " + e);
+                Console.WriteLine(e.StackTrace);
+                return result;
+            }
+            finally
+            {
+                connection.Close();
+                connection.Dispose();
+                connection = null;
+            }
+
+        }
+
     }
 
 }

@@ -21,13 +21,12 @@ namespace Coctel.ViewModel.Commands
 
         public bool CanExecute(object parameter)
         {
-            string query = parameter.ToString();
-            return (query != null);
+            return (VM.query != null);
         }
 
         public void Execute(object parameter)
         {
-            string query = parameter as string;
+            var query = parameter as string;
             VM.GetCocktails(query);
         }
     }
