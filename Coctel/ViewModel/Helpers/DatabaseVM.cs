@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.Common;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
@@ -30,7 +31,7 @@ namespace Coctel.ViewModel.Helpers
             string password = "developing";
             return GetDBConnection(dataSource, initialCatalog, user, password);
         }
-        public static bool InsertCocktail(Cocktail item, Usuario user)
+        public static bool Insert(int item, Usuario user, string table)
         {
             bool result = false;
             SqlConnection connection = GetDBConnection();
@@ -39,21 +40,20 @@ namespace Coctel.ViewModel.Helpers
             {
                 // Definicion de comando Insert
 
-                SqlCommand insertCommand = connection.CreateCommand();
-                int usuario_id = user.ID;
-                int coctel_id = item.ID;
-                insertCommand.CommandText = "INSERT INTO Favorito (usuario_ID, coctel_ID) VALUES (@usuario_ID, @coctel_ID)";
+                SqlCommand command = connection.CreateCommand();
+                command.CommandText = $"INSERT INTO {table} VALUES (@usuario_ID, @item_ID)";
 
                 // Creacion de parametros
 
-                SqlParameter userParam = insertCommand.Parameters.Add("@usuario_ID", SqlDbType.Int);
+                SqlParameter userParam = command.Parameters.Add("@usuario_ID", SqlDbType.Int);
                 userParam.Value = user.ID;
 
-                SqlParameter coctelParam = insertCommand.Parameters.Add("@coctel_ID", SqlDbType.Int);
-                coctelParam.Value = item.ID;
+                SqlParameter itemParam = command.Parameters.Add("@item_ID", SqlDbType.Int);
+                itemParam.Value = item;
+
 
                 // Ejecucion del comando
-                if (insertCommand.ExecuteNonQuery() > 0) result = true;
+                if (command.ExecuteNonQuery() > 0) result = true;
             }
             catch (Exception e)
             {
@@ -69,69 +69,32 @@ namespace Coctel.ViewModel.Helpers
             return result;
 
         }
-        public static bool InsertIngrediente(Ingrediente item, Usuario user)
-        {
-            bool result = false;
-            SqlConnection connection = GetDBConnection();
-            connection.Open();
-            try
-            {
-                // Definicion de comando Insert
-
-                SqlCommand insertCommand = connection.CreateCommand();
-                int usuario_id = user.ID;
-                int coctel_id = item.ID;
-                insertCommand.CommandText = "INSERT INTO Inventario (usuario_ID, ingrediente_ID) VALUES (@usuario_ID, @ingrediente_ID)";
-
-                // Creacion de parametros
-
-                SqlParameter userParam = insertCommand.Parameters.Add("@usuario_ID", SqlDbType.Int);
-                userParam.Value = user.ID;
-
-                SqlParameter ingredienteParam = insertCommand.Parameters.Add("@ingrediente_ID", SqlDbType.Int);
-                ingredienteParam.Value = item.ID;
-
-                // Ejecucion del comando
-                if (insertCommand.ExecuteNonQuery() > 0) result = true;
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine("Error: " + e);
-                Console.WriteLine(e.StackTrace);
-            }
-            finally
-            {
-                connection.Close();
-                connection.Dispose();
-                connection = null;
-            }
-            return result;
-        }
-        public static bool DeleteCocktail(Cocktail item, Usuario user)
+        public static bool Delete(int item, Usuario user, string table)
         {
             {
                 bool result = false;
                 SqlConnection connection = GetDBConnection();
                 connection.Open();
+                string table_ID = "";
+                if (table == "Inventario") table_ID = "ingrediente_ID";
+                if (table == "Favorito") table_ID = "coctel_ID";
                 try
                 {
                     // Definicion de comando Delete
 
-                    SqlCommand insertCommand = connection.CreateCommand();
-                    int usuario_id = user.ID;
-                    int coctel_id = item.ID;
-                    insertCommand.CommandText = "DELETE FROM Favorito WHERE (usuario_ID = @usuario_ID and coctel_ID=@coctel_ID)";
+                    SqlCommand command = connection.CreateCommand();
+                    command.CommandText = $"DELETE FROM {table} WHERE (usuario_ID = @usuario_ID and {table_ID}=@item_ID)";
 
                     // Creacion de parametros
 
-                    SqlParameter userParam = insertCommand.Parameters.Add("@usuario_ID", SqlDbType.Int);
+                    SqlParameter userParam = command.Parameters.Add("@usuario_ID", SqlDbType.Int);
                     userParam.Value = user.ID;
 
-                    SqlParameter coctelParam = insertCommand.Parameters.Add("@coctel_ID", SqlDbType.Int);
-                    coctelParam.Value = item.ID;
+                    SqlParameter itemParam = command.Parameters.Add("@item_ID", SqlDbType.Int);
+                    itemParam.Value = item;
 
                     // Ejecucion del comando
-                    if (insertCommand.ExecuteNonQuery() > 0) result = true;
+                    if (command.ExecuteNonQuery() > 0) result = true;
                 }
                 catch (Exception e)
                 {
@@ -148,30 +111,63 @@ namespace Coctel.ViewModel.Helpers
             }
             
         }
-        public static bool DeleteIngrediente(Ingrediente item, Usuario user)
+
+        public static List<Cocktail> Read()
         {
-            bool result = false;
+            List<Cocktail> result = new List<Cocktail>();
+            result.Clear();
             SqlConnection connection = GetDBConnection();
             connection.Open();
             try
             {
-                // Definicion de comando Delete
+                // Definicion de comando Query
 
-                SqlCommand insertCommand = connection.CreateCommand();
-                int usuario_id = user.ID;
-                int coctel_id = item.ID;
-                insertCommand.CommandText = "DELETE FROM Ingrediente WHERE (usuario_ID = @usuario_ID and ingrediente_ID =@ingrediente_ID)";
-
-                // Creacion de parametros
-
-                SqlParameter userParam = insertCommand.Parameters.Add("@usuario_ID", SqlDbType.Int);
-                userParam.Value = user.ID;
-
-                SqlParameter coctelParam = insertCommand.Parameters.Add("@coctel_ID", SqlDbType.Int);
-                coctelParam.Value = item.ID;
+                SqlCommand command = new SqlCommand("SELECT C.*, T.nombre AS tipo FROM Coctel C INNER JOIN Tipo T ON C.tipo_ID = T.tipo_ID WHERE C.porcentaje_Recomendacion >= 70 ", connection);
 
                 // Ejecucion del comando
-                if (insertCommand.ExecuteNonQuery() > 0) result = true;
+
+                using (DbDataReader reader = command.ExecuteReader())
+                {
+                    if (reader.HasRows)
+                    {
+                        while (reader.Read())
+                        {
+                            int id_column = reader.GetOrdinal("coctel_ID");
+                            int newID = Convert.ToInt32(reader.GetValue(id_column));
+
+                            int descripcion_column = reader.GetOrdinal("descripcion");
+                            string newDescripcion = reader.GetString(descripcion_column);
+
+                            int nombre_column = reader.GetOrdinal("nombre");
+                            string newNombre = reader.GetString(nombre_column);
+
+                            int dificultad_column = reader.GetOrdinal("dificultad");
+                            int newDificultad = Convert.ToInt32(reader.GetValue(dificultad_column));
+
+                            int tipo_column = reader.GetOrdinal("tipo");
+                            string newTipo = reader.GetString(tipo_column);
+
+                            int tiempo_column = reader.GetOrdinal("tiempo_Elaboracion");
+                            int newTiempo = Convert.ToInt32(reader.GetValue(tiempo_column));
+
+                            int porcentaje_column = reader.GetOrdinal("porcentaje_Recomendacion");
+                            int newPorcentaje = Convert.ToInt32(reader.GetValue(porcentaje_column));
+
+                            Cocktail cocktail = new Cocktail()
+                            {
+                                ID = newID,
+                                Descripcion = newDescripcion,
+                                Nombre = newNombre,
+                                Dificultad = newDificultad,
+                                Tipo = newTipo,
+                                TiempoElaboracion = newTiempo,
+                                PorcentajeRecomendacion = newPorcentaje,
+                                Ingredientes = new List<Ingrediente>()
+                            };
+                            result.Add(cocktail);
+                        }
+                    }
+                }
             }
             catch (Exception e)
             {
@@ -186,9 +182,265 @@ namespace Coctel.ViewModel.Helpers
             }
             return result;
         }
+        public static List<Cocktail> Read(string query) //Override para busquedas
+        {
+            List<Cocktail> result = new List<Cocktail>();
+            result.Clear();
+            SqlConnection connection = GetDBConnection();
+            connection.Open();
+            try
+            {
+                // Definicion de comando Query
+
+                SqlCommand command = new SqlCommand("SELECT C.*, T.nombre AS tipo FROM Coctel C INNER JOIN Tipo T ON C.tipo_ID = T.tipo_ID WHERE C.nombre LIKE '%@query%'", connection);
+
+                // Creacion de parametros
+
+                SqlParameter queryParam = command.Parameters.Add("@query", SqlDbType.Int);
+                queryParam.Value = query;
+
+                // Ejecucion del comando
+
+                using (DbDataReader reader = command.ExecuteReader())
+                {
+                    if (reader.HasRows)
+                    {
+                        while (reader.Read())
+                        {
+                            int id_column = reader.GetOrdinal("coctel_ID");
+                            int newID = Convert.ToInt32(reader.GetValue(id_column));
+
+                            int descripcion_column = reader.GetOrdinal("descripcion");
+                            string newDescripcion = reader.GetString(descripcion_column);
+
+                            int nombre_column = reader.GetOrdinal("nombre");
+                            string newNombre = reader.GetString(nombre_column);
+
+                            int dificultad_column = reader.GetOrdinal("dificultad");
+                            int newDificultad = Convert.ToInt32(reader.GetValue(dificultad_column));
+
+                            int tipo_column = reader.GetOrdinal("tipo");
+                            string newTipo = reader.GetString(tipo_column);
+
+                            int tiempo_column = reader.GetOrdinal("tiempo_Elaboracion");
+                            int newTiempo = Convert.ToInt32(reader.GetValue(tiempo_column));
+
+                            int porcentaje_column = reader.GetOrdinal("porcentaje_Recomendacion");
+                            int newPorcentaje = Convert.ToInt32(reader.GetValue(porcentaje_column));
+
+                            Cocktail cocktail = new Cocktail()
+                            {
+                                ID = newID,
+                                Descripcion = newDescripcion,
+                                Nombre = newNombre,
+                                Dificultad = newDificultad,
+                                Tipo = newTipo,
+                                TiempoElaboracion = newTiempo,
+                                PorcentajeRecomendacion = newPorcentaje,
+                                Ingredientes = new List<Ingrediente>()
+                            };
+                            result.Add(cocktail);
+                        }
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Error: " + e);
+                Console.WriteLine(e.StackTrace);
+            }
+            finally
+            {
+                connection.Close();
+                connection.Dispose();
+                connection = null;
+            }
+            return result;
+        }
+        public static List<Cocktail> Read(Usuario user) // Override del metodo anterior que devuelve lista de favoritos
+        {
+            List<Cocktail> result = new List<Cocktail>();
+            result.Clear();
+            SqlConnection connection = GetDBConnection();
+            connection.Open();
+            try
+            {
+                // Definicion de comando Query
+
+                SqlCommand command = new SqlCommand("SELECT C.*, T.nombre AS tipo FROM Favorito F INNER JOIN Coctel C ON F.coctel_ID = C.coctel_ID INNER JOIN Tipo T ON C.tipo_ID = T.tipo_ID WHERE F.usuario_ID = @usuario_ID", connection);
+
+                // Creacion de parametros
+
+                SqlParameter userParam = command.Parameters.Add("@usuario_ID", SqlDbType.Int);
+                userParam.Value = user.ID;
+
+                // Ejecucion del comando
+
+
+                using (DbDataReader reader = command.ExecuteReader())
+                {
+                    if (reader.HasRows)
+                    {
+                        while (reader.Read())
+                        {
+                            int id_column = reader.GetOrdinal("coctel_ID");
+                            int newID = Convert.ToInt32(reader.GetValue(id_column));
+
+                            int descripcion_column = reader.GetOrdinal("descripcion");
+                            string newDescripcion = reader.GetString(descripcion_column);
+
+                            int nombre_column = reader.GetOrdinal("nombre");
+                            string newNombre = reader.GetString(nombre_column);
+
+                            int dificultad_column = reader.GetOrdinal("dificultad");
+                            int newDificultad = Convert.ToInt32(reader.GetValue(dificultad_column));
+
+                            int tipo_column = reader.GetOrdinal("tipo");
+                            string newTipo = reader.GetString(tipo_column);
+
+                            int tiempo_column = reader.GetOrdinal("tiempo_Elaboracion");
+                            int newTiempo = Convert.ToInt32(reader.GetValue(tiempo_column));
+
+                            int porcentaje_column = reader.GetOrdinal("porcentaje_Recomendacion");
+                            int newPorcentaje = Convert.ToInt32(reader.GetValue(porcentaje_column));
+
+                            Cocktail cocktail = new Cocktail()
+                            {
+                                ID = newID,
+                                Descripcion = newDescripcion,
+                                Nombre = newNombre,
+                                Dificultad = newDificultad,
+                                Tipo = newTipo,
+                                TiempoElaboracion = newTiempo,
+                                PorcentajeRecomendacion = newPorcentaje,
+                                Ingredientes = new List<Ingrediente>()
+                            };
+                            result.Add(cocktail);
+                        }
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Error: " + e);
+                Console.WriteLine(e.StackTrace);
+            }
+            finally
+            {
+                connection.Close();
+                connection.Dispose();
+                connection = null;
+            }
+            return result;
+        }
+        public static bool Login(string usuario, string password)
+        {
+            SqlConnection connection = GetDBConnection();
+            connection.Open();
+            try
+            {
+                // Definicion de comando Query
+
+                SqlCommand command = new SqlCommand("SELECT * FROM Usuario WHERE nombre = @nombre AND clave = @password", connection);
+
+                // Creacion de parametros
+
+                SqlParameter userParam = command.Parameters.Add("@nombre", SqlDbType.VarChar);
+                userParam.Value = usuario;
+
+                SqlParameter claveParam = command.Parameters.Add("@password", SqlDbType.VarChar);
+                claveParam.Value = password;
+
+                // Ejecucion del comando
+
+
+                using (DbDataReader reader = command.ExecuteReader())
+                {
+                    return (reader.HasRows);
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Error: " + e);
+                Console.WriteLine(e.StackTrace);
+                return false;
+            }
+            finally
+            {
+                connection.Close();
+                connection.Dispose();
+                connection = null;
+            }
+
+        }
+        public static List<Ingrediente> ReadIngredients(Cocktail item)
+        {
+            List<Ingrediente> result = new List<Ingrediente>();
+            result.Clear();
+            SqlConnection connection = GetDBConnection();
+            connection.Open();
+            try
+            {
+                // Definicion de comando Query
+
+                SqlCommand command = new SqlCommand("SELECT I.*, C.cantidad FROM Contenido C INNER JOIN Ingrediente I ON C.ingrediente_ID = I.ingrediente_ID WHERE C.coctel_ID = @coctel_ID", connection);
+
+                // Creacion de parametros
+
+                SqlParameter cocktailParam = command.Parameters.Add("@coctel_ID", SqlDbType.Int);
+                cocktailParam.Value = item.ID;
+
+                // Ejecucion del comando
+
+
+                using (DbDataReader reader = command.ExecuteReader())
+                {
+                    if (reader.HasRows)
+                    {
+                        while (reader.Read())
+                        {
+                            int id_column = reader.GetOrdinal("ingrediente_ID");
+                            int newID = Convert.ToInt32(reader.GetValue(id_column));
+
+                            int calorias_column = reader.GetOrdinal("calorias");
+                            int newCalorias = Convert.ToInt32(reader.GetValue(calorias_column));
+
+                            int nombre_column = reader.GetOrdinal("nombre");
+                            string newNombre = reader.GetString(nombre_column);
+
+                            int porcentaje_column = reader.GetOrdinal("porcentaje_Alcohol");
+                            int newPorcentaje = Convert.ToInt32(reader.GetValue(porcentaje_column));
+
+                            int cantidad_column = reader.GetOrdinal("cantidad");
+                            int newCantidad = Convert.ToInt32(reader.GetValue(cantidad_column));
+
+                            Ingrediente ingrediente = new Ingrediente()
+                            {
+                                ID = newID,
+                                Nombre = newNombre,
+                                Calorias = newCalorias,
+                                PorcentajeAlcohol = newPorcentaje,
+                                Cantidad = newCantidad
+                            };
+                            result.Add(ingrediente);
+                        }
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Error: " + e);
+                Console.WriteLine(e.StackTrace);
+            }
+            finally
+            {
+                connection.Close();
+                connection.Dispose();
+                connection = null;
+            }
+            return result;
+        }
+    
     }
 
 }
-
-
-

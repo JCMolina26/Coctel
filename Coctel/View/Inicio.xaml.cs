@@ -51,5 +51,15 @@ namespace Coctel
             }
             Console.Read();
         }
+
+        private void QueryCocktailTextBox_GotFocus(object sender, RoutedEventArgs e)
+        {
+            if (queryCocktailTextBox.Text == "Buscar cóctel...") queryCocktailTextBox.Text = "";
+        }
+        private void QueryCocktailTextBox_LostFocus(object sender, RoutedEventArgs e)
+        {
+            if (queryCocktailTextBox.Text == "") queryCocktailTextBox.Text = "Buscar cóctel...";
+        }
+
     }
 }
