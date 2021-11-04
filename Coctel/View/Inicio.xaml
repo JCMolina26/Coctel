@@ -56,7 +56,7 @@
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
                     <Border BorderThickness="10"/>
-                    <TextBox Grid.Column="0" x:Name="queryCocktailTextBox"  Text="Buscar cóctel..." VerticalAlignment="Center" LostFocus="QueryCocktailTextBox_LostFocus" GotFocus="QueryCocktailTextBox_GotFocus" TextChanged="{Binding SearchCommand}"/>
+                    <TextBox Grid.Column="0" x:Name="queryCocktailTextBox"  Text="Buscar cóctel..." VerticalAlignment="Center" LostFocus="QueryCocktailTextBox_LostFocus" GotFocus="QueryCocktailTextBox_GotFocus"/>
                     <Button Grid.Column="1" Content="Buscar" Margin="10"/>
                 </Grid>
             </StackPanel>

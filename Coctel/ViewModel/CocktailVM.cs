@@ -56,9 +56,18 @@ namespace Coctel.ViewModel
             User.Favoritos.Add(cocktail);
             DatabaseVM.Insert(cocktail.ID, User, "Favorito");    
         }
-        private void GetCocktails()
+        public void GetCocktails()
         {
             var cocktails = DatabaseVM.Read();
+            Cocktails.Clear();
+            foreach (var cocktail in cocktails)
+            {
+                Cocktails.Add(cocktail);
+            }
+        }
+        public void GetCocktails(string query)
+        {
+            var cocktails = DatabaseVM.Read(query);
             Cocktails.Clear();
             foreach (var cocktail in cocktails)
             {

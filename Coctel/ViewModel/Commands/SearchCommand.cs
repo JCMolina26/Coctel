@@ -1,4 +1,5 @@
 ﻿using Coctel.ViewModel.Helpers;
+using CoctelClasses.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,14 +21,14 @@ namespace Coctel.ViewModel.Commands
 
         public bool CanExecute(object parameter)
         {
-            string query = parameter as string;
+            string query = parameter.ToString();
             return (query != null);
         }
 
         public void Execute(object parameter)
         {
             string query = parameter as string;
-            DatabaseVM.Read(query);
+            VM.GetCocktails(query);
         }
     }
 }
