@@ -93,7 +93,6 @@ namespace Coctel.ViewModel
                 Cocktails.Add(cocktail);
             }        
         }
-
         public void GetIngredients(Cocktail item)
         {
             var ingredientes = DatabaseVM.Read(item);
