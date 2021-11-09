@@ -30,8 +30,9 @@
                 <RowDefinition Height="6*"/>
             </Grid.RowDefinitions>
             <!--Mensaje de bienvenida de coctel-->
-            <TextBlock Grid.Row="0" Text="Bienvenido a Cóctel" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="30" Margin="36,0,0,0"/>
+            <TextBlock Grid.Row="0" Text="Bienvenido a Cóctel" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="30"/>
             <!-- Sección destinada a LOGIN -->
+
             <StackPanel Margin="140,5"  Grid.Row="1">
                 <TextBlock Text="Usuario:" HorizontalAlignment="Center"  />
                 <TextBox Text="{Binding username}"  Margin="10,2" />
@@ -79,7 +80,16 @@
                                 <StackPanel>
                                     <TextBlock Text="{Binding Nombre}" FontWeight="Bold" FontSize="14"/>
                                     <TextBlock Text="{Binding Descripcion}"/>
-                                    <TextBlock Text="{Binding Dificultad}"/>
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="Dificultad: "/>
+                                        <TextBlock Text="{Binding Dificultad}"/>
+                                        <TextBlock Text="/5"/>
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="Tiempo de elaboración: "/>
+                                        <TextBlock Text="{Binding TiempoElaboracion}"/>
+                                        <TextBlock Text=" minutos"/>
+                                    </StackPanel>
                                 </StackPanel>
                             </DataTemplate>
                         </ListView.ItemTemplate>
@@ -91,8 +101,12 @@
                     <ListView.ItemTemplate>
                         <DataTemplate>
                             <StackPanel Width="100">
-                                <TextBlock Text="{Binding Nombre}"/>
-                                <TextBlock HorizontalAlignment="Right" Text="{Binding Cantidad}"/>
+                                <TextBlock Text="{Binding Nombre}" FontWeight="Bold" FontSize="14"/>
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="Cantidad: "/>
+                                    <TextBlock Text="{Binding Cantidad}"/>
+                                </StackPanel>
+
                             </StackPanel>
                             
                         </DataTemplate>
