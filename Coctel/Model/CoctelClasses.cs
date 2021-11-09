@@ -11,7 +11,6 @@ namespace CoctelClasses.Model
     {
 
         public int ID { get; set; }
-        public List<Ingrediente> Ingredientes { get; set; }
         public string Nombre { get; set; }
         public string Tipo { get; set; }
         public int Dificultad { get; set; }

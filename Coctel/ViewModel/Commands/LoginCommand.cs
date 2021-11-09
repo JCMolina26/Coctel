@@ -25,8 +25,7 @@ namespace Coctel.ViewModel.Commands
 
         public void Execute(object parameter)
         {
-            string password = parameter as string;
-            VM.Login(VM.username, password);
+            VM.Login(VM.Username, VM.Password);
         }
     }
 }

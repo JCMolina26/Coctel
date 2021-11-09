@@ -21,7 +21,7 @@ namespace Coctel.ViewModel.Commands
 
         public bool CanExecute(object parameter)
         {
-            return (VM.query != null);
+            return (VM.Query != null);
         }
 
         public void Execute(object parameter)

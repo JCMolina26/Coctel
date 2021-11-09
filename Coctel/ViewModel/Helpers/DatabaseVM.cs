@@ -163,7 +163,6 @@ namespace Coctel.ViewModel.Helpers
                                 Tipo = newTipo,
                                 TiempoElaboracion = newTiempo,
                                 PorcentajeRecomendacion = newPorcentaje,
-                                Ingredientes = new List<Ingrediente>()
                             };
                             result.Add(cocktail);                         
                         }
@@ -231,10 +230,8 @@ namespace Coctel.ViewModel.Helpers
                                 Dificultad = newDificultad,
                                 Tipo = newTipo,
                                 TiempoElaboracion = newTiempo,
-                                PorcentajeRecomendacion = newPorcentaje,
-                                Ingredientes = new List<Ingrediente>()
+                                PorcentajeRecomendacion = newPorcentaje
                             };
-                            cocktail.Ingredientes = Read(cocktail);
                             result.Add(cocktail);
                         }
                     }
@@ -309,7 +306,6 @@ namespace Coctel.ViewModel.Helpers
                                 Tipo = newTipo,
                                 TiempoElaboracion = newTiempo,
                                 PorcentajeRecomendacion = newPorcentaje,
-                                Ingredientes = new List<Ingrediente>()
                             };
                             result.Add(cocktail);
                         }
@@ -481,28 +477,28 @@ namespace Coctel.ViewModel.Helpers
                 {
                     if (reader.HasRows)
                     {
+                        while (reader.Read())
+                        {
+                            int id_column = reader.GetOrdinal("usuario_ID");
+                            int newID = Convert.ToInt32(reader.GetValue(id_column));
 
-                        int id_column = reader.GetOrdinal("usuario_ID");
-                        int newID = Convert.ToInt32(reader.GetValue(id_column));
+                            result.ID = newID;
+                            result.Nombre = usuario;
+                            result.Password = password;
 
-                        result.ID = newID;
-                        result.Nombre = usuario;
-                        result.Password = password;
-
-                        favoritos = Read(result);
-                        inventario = ReadInventario(result);
-                        result.Favoritos = favoritos;
-                        result.Inventario = inventario;
-                        return result;
+                            favoritos = Read(result);
+                            inventario = ReadInventario(result);
+                            result.Favoritos = favoritos;
+                            result.Inventario = inventario;
+                        }
                     }
-                    else { return result; }
+                    
                 }
             }
             catch (Exception e)
             {
                 Console.WriteLine("Error: " + e);
-                Console.WriteLine(e.StackTrace);
-                return result;
+                Console.WriteLine(e.StackTrace);               
             }
             finally
             {
@@ -510,6 +506,7 @@ namespace Coctel.ViewModel.Helpers
                 connection.Dispose();
                 connection = null;
             }
+            return result;
 
         }
 

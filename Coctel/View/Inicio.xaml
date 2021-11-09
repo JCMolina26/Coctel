@@ -35,9 +35,9 @@
 
             <StackPanel Margin="140,5"  Grid.Row="1">
                 <TextBlock Text="Usuario:" HorizontalAlignment="Center"  />
-                <TextBox Text="{Binding username}"  Margin="10,2" />
+                <TextBox Text="{Binding Username}"  Margin="10,2" />
                 <TextBlock Text="Contraseña:" HorizontalAlignment="Center"/>
-                <TextBox Text="{Binding password}" Margin="10,2" />
+                <TextBox Text="{Binding Password}" Margin="10,2" />
                 <Grid Margin="0,10,0,0">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="2*"/>
@@ -46,7 +46,7 @@
                     </Grid.ColumnDefinitions>
                     <TextBlock Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Center" Text="¿Olvidaste la contraseña?" />
                     <TextBlock Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center" Text="Registrarse" />
-                    <Button Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.ColumnSpan="1" Content="Iniciar sesión" Command="{Binding LoginCommand}" CommandParameter="{Binding password}"/>
+                    <Button Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.ColumnSpan="1" Content="Iniciar sesión" Command="{Binding LoginCommand}"/>
                 </Grid>
             </StackPanel>
             <!-- Sección dedicada a búsqueda-->
@@ -57,8 +57,8 @@
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
                     <Border BorderThickness="10"/>
-                    <TextBox Grid.Column="0" x:Name="query" Text="{Binding query}"  VerticalAlignment="Center"/>
-                    <Button Grid.Column="1" Content="Buscar" Margin="10" Command="{Binding SearchCommand}" CommandParameter="{Binding query}"/>
+                    <TextBox Grid.Column="0" Text="{Binding Query}"  VerticalAlignment="Center"/>
+                    <Button Grid.Column="1" Content="Buscar" Margin="10" Command="{Binding SearchCommand}" CommandParameter="{Binding Query}"/>
                 </Grid>
             </StackPanel>
             <!-- Sección dedicada a la lista de cócteles -->
@@ -74,7 +74,7 @@
                         <RowDefinition Height="50"/>
                     </Grid.RowDefinitions>
                     <!--Cocteles-->
-                    <ListView Grid.Row="0" x:Name="cocktailLV" SelectedItem="{Binding selectedCocktail}" ItemsSource="{Binding Cocktails}">
+                    <ListView Grid.Row="0" SelectedItem="{Binding SelectedCocktail, Mode=TwoWay}" ItemsSource="{Binding Cocktails, Mode=TwoWay}">
                         <ListView.ItemTemplate>
                             <DataTemplate>
                                 <StackPanel>
@@ -94,7 +94,7 @@
                             </DataTemplate>
                         </ListView.ItemTemplate>
                     </ListView>
-                    <Button Grid.Row="1" Content="Añadir a favoritos" Margin="10" HorizontalAlignment="Right" Height="25" Width="100" Command="{Binding NewFavCommand}" CommandParameter="{Binding selectedCocktail}"/>
+                    <Button Grid.Row="1" Content="Añadir a favoritos" Margin="10" HorizontalAlignment="Right" Height="25" Width="100" Command="{Binding NewFavCommand}"/>
                 </Grid>
                 <!--Lista de ingredientes-->
                 <ListView Grid.Column="1" ItemsSource="{Binding Ingredientes}">

@@ -4,13 +4,14 @@ using CoctelClasses.Model;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace Coctel.ViewModel
 {
-    class CocktailVM
+    class CocktailVM: INotifyPropertyChanged
     {
         public CocktailVM()
         {         
@@ -24,23 +25,59 @@ namespace Coctel.ViewModel
             Cocktails = new ObservableCollection<Cocktail>();
             Ingredientes = new ObservableCollection<Ingrediente>();
             IsLogged = false;
-            query = "Buscar cóctel...";
-
-            Login(username, password);
-            GetCocktails();
+            Query = "Buscar cóctel...";
+            GetCocktails();         
         }
 
         // Properties //
         public ObservableCollection<Cocktail> Cocktails { get; set; }
         public ObservableCollection<Ingrediente> Ingredientes { get; set; }
 
-        
-        public string username { get; set; }
-        public string password { get; set; }
-        public string query { get; set; }
+
+        private string username;
+
+        public string Username
+        {
+            get { return username; }
+            set { username = value; }
+        }
+
+        private string password;
+
+        public string Password
+        {
+            get { return password; }
+            set { password = value; }
+        }
+
         public Usuario User { get; set; }
-        public Cocktail selectedCocktail { get; set; }
+        private string query;
+
+        public string Query
+        {
+            get { return query; }
+            set { query = value;
+                OnPropertyChanged("Query");
+                if (query != null) { GetCocktails(Query); }
+            }
+        }
+
+
+        private Cocktail selectedCocktail;
+
+        public Cocktail SelectedCocktail
+        {
+            get { return selectedCocktail; }
+            
+            set {
+                selectedCocktail = value;
+                OnPropertyChanged("SelectedCocktail");
+                if (selectedCocktail != null) { GetIngredients(selectedCocktail); } }
+        }
+
         public bool IsLogged;
+
+        public event PropertyChangedEventHandler PropertyChanged;
 
         // Commands //
         public NewFavCommand NewFavCommand  { get; set; }
@@ -53,45 +90,46 @@ namespace Coctel.ViewModel
         // Methods //
         public void AddIngredient(Ingrediente ingrediente)
         {
-            User.Inventario.Add(ingrediente);
-            DatabaseVM.Insert(ingrediente.ID, User, "Inventario");
+            if (!User.Inventario.Contains(ingrediente))
+            {
+                User.Inventario.Add(ingrediente);
+                DatabaseVM.Insert(ingrediente.ID, User, "Inventario");
+            } 
         }
         public void AddFav(Cocktail cocktail)
         {
-            User.Favoritos.Add(cocktail);
-            DatabaseVM.Insert(cocktail.ID, User, "Favorito");    
+            if (!User.Favoritos.Contains(cocktail))
+            {
+                User.Favoritos.Add(cocktail);
+                DatabaseVM.Insert(cocktail.ID, User, "Favorito");
+            }  
         }
         public void GetCocktails()
         {
             var cocktails = DatabaseVM.Read();
-            var ingredients = DatabaseVM.Read(cocktails.First());
             Cocktails.Clear();
             foreach (var cocktail in cocktails)
             {
                 Cocktails.Add(cocktail);
             }
-            foreach (var ingredient in ingredients)
-            {
-                Ingredientes.Add(ingredient);
-            }
         }
-        public void GetCocktails(string query)
+        public void GetCocktails(string text)
         {
             Cocktails.Clear();
-            Ingredientes.Clear();
-            var cocktails = DatabaseVM.Read(query);
-            if (cocktails.Any())
-            {
-                var ingredients = DatabaseVM.Read(cocktails.First());
-                foreach (var ingredient in ingredients)
-                {
-                    Ingredientes.Add(ingredient);
-                }
-            }           
+            var cocktails = DatabaseVM.Read(text); 
             foreach (var cocktail in cocktails)
             {
                 Cocktails.Add(cocktail);
             }        
+        }
+        public void GetCocktails(Usuario usuario)
+        {
+            Cocktails.Clear();
+            var cocktails = DatabaseVM.Read(usuario);
+            foreach (var cocktail in cocktails)
+            {
+                Cocktails.Add(cocktail);
+            }
         }
         public void GetIngredients(Cocktail item)
         {
@@ -105,7 +143,12 @@ namespace Coctel.ViewModel
         public void Login(string usuario, string pass)
         {
             User = DatabaseVM.Login(usuario, pass);
-            if (User.ID == -1) { IsLogged = true; }
+            if (User.ID != -1) { IsLogged = true; GetCocktails(User); }
+        }
+
+        private void OnPropertyChanged(string propertyName)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 }
