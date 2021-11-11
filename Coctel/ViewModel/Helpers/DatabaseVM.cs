@@ -449,25 +449,18 @@ namespace Coctel.ViewModel.Helpers
             }
             return result;
         }
-        public static Usuario Login(string usuario, string password)
+        public static Usuario Login(Usuario usuario)
         {
             var favoritos = new List<Cocktail>();
             var inventario = new List<Ingrediente>();
-            Usuario result = new Usuario()
-            {
-                ID = -1,
-                Password = password,
-                Nombre = usuario,
-                Favoritos = favoritos,
-                Inventario = inventario
-            };
+           
             SqlConnection connection = GetDBConnection();
             connection.Open();
             try
             {
                 // Definicion de comando Query
 
-                SqlCommand command = new SqlCommand($"SELECT * FROM Usuario WHERE nombre = '{usuario}' AND clave = '{password}'", connection);
+                SqlCommand command = new SqlCommand($"SELECT * FROM Usuario WHERE nombre = '{usuario.Nombre}' AND clave = '{usuario.Password}'", connection);
 
 
                 // Ejecucion del comando
@@ -482,14 +475,12 @@ namespace Coctel.ViewModel.Helpers
                             int id_column = reader.GetOrdinal("usuario_ID");
                             int newID = Convert.ToInt32(reader.GetValue(id_column));
 
-                            result.ID = newID;
-                            result.Nombre = usuario;
-                            result.Password = password;
+                            usuario.ID = newID;
 
-                            favoritos = Read(result);
-                            inventario = ReadInventario(result);
-                            result.Favoritos = favoritos;
-                            result.Inventario = inventario;
+                            favoritos = Read(usuario);
+                            inventario = ReadInventario(usuario);
+                            usuario.Favoritos = favoritos;
+                            usuario.Inventario = inventario;
                         }
                     }
                     
@@ -506,7 +497,7 @@ namespace Coctel.ViewModel.Helpers
                 connection.Dispose();
                 connection = null;
             }
-            return result;
+            return usuario;
 
         }
 

@@ -1,20 +1,19 @@
-﻿using CoctelClasses.Model;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows.Controls;
 using System.Windows.Input;
 
-namespace Coctel.ViewModel.Commands 
+namespace Coctel.ViewModel.Commands
 {
-    class NewFavCommand : ICommand
+    class GetFavCommand : ICommand
     {
         public CocktailVM VM { get; set; }
-        public NewFavCommand(CocktailVM vm)
+        public LoginVM loginVM { get; set; }
+        public GetFavCommand(CocktailVM vm)
         {
-            VM = vm;          
+            VM = vm;
         }
         public event EventHandler CanExecuteChanged
         {
@@ -29,7 +28,7 @@ namespace Coctel.ViewModel.Commands
 
         public void Execute(object parameter)
         {
-            VM.AddFav(VM.SelectedCocktail);            
+            VM.GetCocktails(VM.Login.User);
         }
     }
 }

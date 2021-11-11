@@ -13,18 +13,20 @@ namespace Coctel.ViewModel
 {
     class CocktailVM: INotifyPropertyChanged
     {
+        // Constructor
         public CocktailVM()
         {         
             NewFavCommand = new NewFavCommand(this);
             NewIngredientCommand = new NewIngredientCommand(this);
-            LoginCommand = new LoginCommand(this);
             SearchCommand = new SearchCommand(this);
             GetIngredientsCommand = new GetIngredientsCommand(this);
+            GetFavCommand = new GetFavCommand(this);
 
 
             Cocktails = new ObservableCollection<Cocktail>();
             Ingredientes = new ObservableCollection<Ingrediente>();
-            IsLogged = false;
+            Login = new LoginVM();
+
             Query = "Buscar cóctel...";
             GetCocktails();         
         }
@@ -33,26 +35,14 @@ namespace Coctel.ViewModel
         public ObservableCollection<Cocktail> Cocktails { get; set; }
         public ObservableCollection<Ingrediente> Ingredientes { get; set; }
 
-
-        private string username;
-
-        public string Username
-        {
-            get { return username; }
-            set { username = value; }
+        private LoginVM login;
+        public LoginVM Login
+        { 
+            get { return login; } 
+            set { login = value; OnPropertyChanged("Login"); if (Login.User.ID != -1) GetCocktails(Login.User); } 
         }
-
-        private string password;
-
-        public string Password
-        {
-            get { return password; }
-            set { password = value; }
-        }
-
-        public Usuario User { get; set; }
+        
         private string query;
-
         public string Query
         {
             get { return query; }
@@ -74,36 +64,43 @@ namespace Coctel.ViewModel
                 OnPropertyChanged("SelectedCocktail");
                 if (selectedCocktail != null) { GetIngredients(selectedCocktail); } }
         }
+        private Ingrediente selectedIngredient;
 
-        public bool IsLogged;
+        public Ingrediente SelectedIngredient
+        {
+            get { return selectedIngredient; }
+            set { selectedIngredient = value;
+                OnPropertyChanged("SelectedCocktail");
+            }
+        }
 
         public event PropertyChangedEventHandler PropertyChanged;
 
         // Commands //
         public NewFavCommand NewFavCommand  { get; set; }
         public NewIngredientCommand NewIngredientCommand { get; set; }
-        public LoginCommand LoginCommand { get; set; }
         public SearchCommand SearchCommand { get; set; }
         public GetIngredientsCommand GetIngredientsCommand { get; set; }
+        public GetFavCommand GetFavCommand { get; set; }
 
 
         // Methods //
         public void AddIngredient(Ingrediente ingrediente)
         {
-            if (!User.Inventario.Contains(ingrediente))
+            if (!Login.User.Inventario.Any(item => item.ID == ingrediente.ID))
             {
-                User.Inventario.Add(ingrediente);
-                DatabaseVM.Insert(ingrediente.ID, User, "Inventario");
+                Login.User.Inventario.Add(ingrediente);
+                DatabaseVM.Insert(ingrediente.ID, Login.User, "Inventario");
             } 
         }
         public void AddFav(Cocktail cocktail)
         {
-            if (!User.Favoritos.Contains(cocktail))
+            if (!Login.User.Favoritos.Any(item => item.ID == cocktail.ID))
             {
-                User.Favoritos.Add(cocktail);
-                DatabaseVM.Insert(cocktail.ID, User, "Favorito");
+                Login.User.Favoritos.Add(cocktail);
+                DatabaseVM.Insert(cocktail.ID, Login.User, "Favorito");
             }  
-        }
+        } 
         public void GetCocktails()
         {
             var cocktails = DatabaseVM.Read();
@@ -140,15 +137,11 @@ namespace Coctel.ViewModel
                 Ingredientes.Add(ingrediente);
             }
         }
-        public void Login(string usuario, string pass)
-        {
-            User = DatabaseVM.Login(usuario, pass);
-            if (User.ID != -1) { IsLogged = true; GetCocktails(User); }
-        }
-
         private void OnPropertyChanged(string propertyName)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
+
+        
     }
 }

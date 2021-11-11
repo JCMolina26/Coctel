@@ -15,17 +15,20 @@ namespace Coctel.ViewModel.Commands
         {
             VM = vm;
         }
-        public event EventHandler CanExecuteChanged;
+        public event EventHandler CanExecuteChanged
+        {
+            add { CommandManager.RequerySuggested += value; }
+            remove { CommandManager.RequerySuggested -= value; }
+        }
 
         public bool CanExecute(object parameter)
         {
-            Ingrediente selectedIngredient = parameter as Ingrediente;
-            return /*(IsLogged) &&*/ selectedIngredient != null;
+            return VM.Login.LoginStatus && VM.SelectedIngredient != null;
         }
 
         public void Execute(object parameter)
         {
-            throw new NotImplementedException();
+            VM.AddIngredient(VM.SelectedIngredient);
         }
     }
 }

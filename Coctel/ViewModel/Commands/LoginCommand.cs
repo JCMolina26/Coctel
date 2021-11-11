@@ -1,4 +1,5 @@
 ﻿using Coctel.ViewModel.Helpers;
+using CoctelClasses.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,22 +11,31 @@ namespace Coctel.ViewModel.Commands
 {
     class LoginCommand : ICommand
     {
-        public CocktailVM VM { get; set; }
-        public LoginCommand(CocktailVM vm)
+        public LoginVM VM { get; set; }
+        public LoginCommand(LoginVM vm)
         {
             VM = vm;
         }
 
-        public event EventHandler CanExecuteChanged;
+        public event EventHandler CanExecuteChanged
+        {
+            add { CommandManager.RequerySuggested += value; }
+            remove { CommandManager.RequerySuggested -= value; }
+        }
 
         public bool CanExecute(object parameter)
-        {            
-            return !VM.IsLogged;
+        {
+            Usuario user = parameter as Usuario;
+            if (user == null) return false;
+            if (string.IsNullOrWhiteSpace(user.Nombre)) return false;
+            if (string.IsNullOrWhiteSpace(user.Password)) return false;
+            else return true;
+
         }
 
         public void Execute(object parameter)
         {
-            VM.Login(VM.Username, VM.Password);
+            VM.Login();
         }
     }
 }

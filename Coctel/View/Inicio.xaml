@@ -4,15 +4,15 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:vm="clr-namespace:Coctel.ViewModel"
-        xmlns:local="clr-namespace:Coctel"
+        xmlns:local="clr-namespace:Coctel"        
         mc:Ignorable="d"
         Title="Cóctel" Height="700" Width="600" ResizeMode="NoResize" SizeToContent="Manual" WindowStartupLocation="CenterScreen" Cursor="Pen" >
     <Window.Resources>
         <vm:CocktailVM x:Key="vm"/>
-        
+        <vm:LoginVM x:Key="loginvm"/>
     </Window.Resources>
 
-    <DockPanel DataContext="{StaticResource vm}">
+    <DockPanel>
         <Menu DockPanel.Dock="Top">
             <MenuItem Header="Archivo">
                 <!--Sección dedicada a la documentación-->
@@ -32,37 +32,48 @@
             <!--Mensaje de bienvenida de coctel-->
             <TextBlock Grid.Row="0" Text="Bienvenido a Cóctel" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="30"/>
             <!-- Sección destinada a LOGIN -->
-
-            <StackPanel Margin="140,5"  Grid.Row="1">
-                <TextBlock Text="Usuario:" HorizontalAlignment="Center"  />
-                <TextBox Text="{Binding Username}"  Margin="10,2" />
-                <TextBlock Text="Contraseña:" HorizontalAlignment="Center"/>
-                <TextBox Text="{Binding Password}" Margin="10,2" />
-                <Grid Margin="0,10,0,0">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="2*"/>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="*" />
-                    </Grid.ColumnDefinitions>
-                    <TextBlock Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Center" Text="¿Olvidaste la contraseña?" />
-                    <TextBlock Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center" Text="Registrarse" />
-                    <Button Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.ColumnSpan="1" Content="Iniciar sesión" Command="{Binding LoginCommand}"/>
-                </Grid>
-            </StackPanel>
+            <Grid DataContext="{StaticResource loginvm}" Grid.Row="1">
+                <StackPanel Margin="140,5" Visibility="{Binding LoginVis}">
+                    <TextBlock Text="Usuario:" HorizontalAlignment="Center"  />
+                    <TextBox Text="{Binding User.Nombre, Mode=TwoWay}"  Margin="10,2" />
+                    <TextBlock Text="Contraseña:" HorizontalAlignment="Center"/>
+                    <TextBox Text="{Binding User.Password, Mode=TwoWay}" Margin="10,2" />
+                    <Grid Margin="0,10,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="2*"/>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Center" Text="¿Olvidaste la contraseña?" Foreground="DodgerBlue" TextDecorations="Underline"/>
+                        <Button Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center" Content="Registrarse" Foreground="DodgerBlue" Command="{Binding ShowRegisterCommand}"/>
+                        <Button Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.ColumnSpan="1" Content="Iniciar sesión" Command="{Binding LoginCommand}" CommandParameter="{Binding User}"/>
+                    </Grid>
+                </StackPanel>
+                <StackPanel Margin="140,5" Visibility="{Binding RegisterVis}">
+                    <TextBlock Text="{Binding User.Nombre, Mode=TwoWay}" Margin="10" FontWeight="Bold" HorizontalAlignment="Center"/>
+                    <Button Margin="10" Width="100" Content="Mis Ingredientes" Command="{Binding ShowIngredientsManagerCommand}"/>
+                    <Button Margin="10" Width="100" Content="Mis Favoritos" Command="{Binding GetFavCommand}"/>
+                </StackPanel>
+                <StackPanel Margin="140,5" Visibility="{Binding LoggedVis}">
+                    <TextBlock Text="{Binding Username}" Margin="10" FontWeight="Bold" HorizontalAlignment="Center"/>
+                    <Button Margin="10" Width="100" Content="Mis Ingredientes"/>
+                    <Button Margin="10" Width="100" Content="Mis Favoritos"/>
+                </StackPanel>
+            </Grid>
             <!-- Sección dedicada a búsqueda-->
-            <StackPanel Margin="30,0" Grid.Row="2">
+            <StackPanel DataContext="{StaticResource vm}" Margin="30,0" Grid.Row="2">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="2*"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
                     <Border BorderThickness="10"/>
-                    <TextBox Grid.Column="0" Text="{Binding Query}"  VerticalAlignment="Center"/>
+                    <TextBox Grid.Column="0" Text="{Binding Query, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"  VerticalAlignment="Center"/>
                     <Button Grid.Column="1" Content="Buscar" Margin="10" Command="{Binding SearchCommand}" CommandParameter="{Binding Query}"/>
                 </Grid>
             </StackPanel>
             <!-- Sección dedicada a la lista de cócteles -->
-            <Grid Grid.Row="4">
+            <Grid DataContext="{StaticResource vm}" Grid.Row="4">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="3*"/>
                     <ColumnDefinition Width="2*"/>
@@ -74,7 +85,7 @@
                         <RowDefinition Height="50"/>
                     </Grid.RowDefinitions>
                     <!--Cocteles-->
-                    <ListView Grid.Row="0" SelectedItem="{Binding SelectedCocktail, Mode=TwoWay}" ItemsSource="{Binding Cocktails, Mode=TwoWay}">
+                    <ListView Grid.Row="0" SelectedValue="{Binding SelectedCocktail, Mode=TwoWay}" ItemsSource="{Binding Cocktails, Mode=TwoWay}">
                         <ListView.ItemTemplate>
                             <DataTemplate>
                                 <StackPanel>
@@ -94,7 +105,7 @@
                             </DataTemplate>
                         </ListView.ItemTemplate>
                     </ListView>
-                    <Button Grid.Row="1" Content="Añadir a favoritos" Margin="10" HorizontalAlignment="Right" Height="25" Width="100" Command="{Binding NewFavCommand}"/>
+                    <Button x:Name="favButton" Grid.Row="1" Content="Añadir a favoritos" Margin="10" HorizontalAlignment="Right" Height="25" Width="100" Command="{Binding NewFavCommand}"/>
                 </Grid>
                 <!--Lista de ingredientes-->
                 <ListView Grid.Column="1" ItemsSource="{Binding Ingredientes}">
