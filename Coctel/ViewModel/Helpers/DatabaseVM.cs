@@ -41,7 +41,7 @@ namespace Coctel.ViewModel.Helpers
                 // Definicion de comando Insert
 
                 SqlCommand command = connection.CreateCommand();
-                command.CommandText = $"INSERT INTO {table} VALUES (@usuario_ID, @item_ID)";
+                command.CommandText = $"INSERT INTO {table} VALUES (@usuario_ID, @item_ID)"; // Tabla será Inventario, Contenido o Favoritos //
 
                 // Creacion de parametros
 
@@ -123,7 +123,7 @@ namespace Coctel.ViewModel.Helpers
             {
                 // Definicion de comando Query
 
-                SqlCommand command = new SqlCommand("SELECT C.*, T.nombre AS tipo FROM Coctel C INNER JOIN Tipo T ON C.tipo_ID = T.tipo_ID WHERE C.porcentaje_Recomendacion >= 70 ", connection);
+                SqlCommand command = new SqlCommand("SELECT C.*, T.nombre AS tipo FROM Coctel C INNER JOIN Tipo T ON C.tipo_ID = T.tipo_ID WHERE (C.porcentaje_recomendacion > 69) ORDER BY C.porcentaje_recomendacion DESC ", connection);
 
                 // Ejecucion del comando
 

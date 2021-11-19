@@ -10,7 +10,6 @@ namespace Coctel.ViewModel.Commands
     class GetFavCommand : ICommand
     {
         public CocktailVM VM { get; set; }
-        public LoginVM loginVM { get; set; }
         public GetFavCommand(CocktailVM vm)
         {
             VM = vm;
@@ -23,12 +22,12 @@ namespace Coctel.ViewModel.Commands
 
         public bool CanExecute(object parameter)
         {
-            return VM.Login.LoginStatus;
+            return true;
         }
 
         public void Execute(object parameter)
         {
-            VM.GetCocktails(VM.Login.User);
+            VM.GetFavCocktails();
         }
     }
 }

@@ -141,7 +141,15 @@ namespace Coctel.ViewModel
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
+        public void GetFavCocktails()
+        {
+            Cocktails.Clear();
+            var cocktails = DatabaseVM.Read(Login.User);
+            foreach (var cocktail in cocktails)
+            {
+                Cocktails.Add(cocktail);
+            }
+        }
 
-        
     }
 }

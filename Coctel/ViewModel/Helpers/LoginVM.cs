@@ -22,6 +22,8 @@ namespace Coctel.ViewModel
             User = new Usuario() { ID = -1 };
             LoginStatus = false;
 
+            Login();
+
             RegisterCommand = new RegisterCommand(this);
             LoginCommand = new LoginCommand(this);
             ShowRegisterCommand = new ShowRegisterCommand(this);
@@ -91,12 +93,12 @@ namespace Coctel.ViewModel
             isShowingRegister = !isShowingRegister;
             if (isShowingRegister)
             {
-                RegisterVis = Visibility.Visible;
+                LoggedVis = Visibility.Visible;
                 LoginVis = Visibility.Collapsed;
             }
             else
             {
-                RegisterVis = Visibility.Collapsed;
+                LoggedVis = Visibility.Collapsed;
                 LoginVis = Visibility.Visible;
             }
         }
@@ -110,5 +112,6 @@ namespace Coctel.ViewModel
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
+
     }
 }

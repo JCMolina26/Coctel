@@ -2,12 +2,24 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net5.0-windows</TargetFramework>
+    <TargetFramework>net6.0-windows10.0.22000.0</TargetFramework>
     <UseWPF>true</UseWPF>
+    <UseWindowsForms>True</UseWindowsForms>
+    <StartupObject>Coctel.App</StartupObject>
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="View\icon.png" />
+    <None Remove="View\icon2.png" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="System.Data.SqlClient" Version="4.8.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="View\icon.png" />
+    <Resource Include="View\icon2.png" />
   </ItemGroup>
 
 </Project>
